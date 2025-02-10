@@ -30,7 +30,7 @@ class AuthController extends Controller
         $token = JWTAuth::fromUser($user);
 
         return response()->json([
-            'message' => 'User registered successfully',
+            'message' => __('messages.register_success'),
             'user' => $user,
             'token' => $token
         ], 201);
@@ -53,11 +53,11 @@ class AuthController extends Controller
 
         if (!$user) {
             RateLimiter::hit($key, 60);
-            return response()->json(['message' => 'بيانات تسجيل الدخول غير صحيحة'], 401);
+            return response()->json(['message' => __('messages.login_failed')], 401);
         }
 
         if ($user->disabled) {
-            return response()->json(['message' => 'تم تعطيل هذا الحساب، يرجى التواصل مع الدعم'], 403);
+            return response()->json(['message' => __('messages.account_disabled')], 403);
         }
 
         RateLimiter::clear($key);
@@ -70,7 +70,7 @@ class AuthController extends Controller
         $token = JWTAuth::fromUser($user);
 
         return response()->json([
-            'message' => 'Login successful',
+            'message' => __('messages.login_success'),
             'user' => $user,
             'token' => $token
         ], 200);
@@ -80,7 +80,7 @@ class AuthController extends Controller
     {
         JWTAuth::invalidate(JWTAuth::getToken()); // حذف التوكن
 
-        return response()->json(['message' => 'Logout successful']);
+        return response()->json(['message' => __('messages.logout_success')]);
     }
 
     public function refresh()
@@ -88,7 +88,7 @@ class AuthController extends Controller
         $newToken = JWTAuth::refresh(JWTAuth::getToken()); // تحديث التوكن
 
         return response()->json([
-            'message' => 'Token refreshed',
+            'message' => __('messages.token-refreshed'),
             'token' => $newToken
         ]);
     }
@@ -110,7 +110,7 @@ class AuthController extends Controller
 
         $user->update($request->only(['username', 'email']));
 
-        return response()->json(['message' => 'Profile updated successfully', 'user' => $user]);
+        return response()->json(['message' => __('messages.user-update'), 'user' => $user]);
     }
 
     private function encryptPassword($password)
