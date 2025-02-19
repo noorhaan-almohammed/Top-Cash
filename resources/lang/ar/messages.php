@@ -10,4 +10,8 @@ return [
     'token-refreshed' => 'تم تحديث التوكن',
     'user-update' => 'تم تحديث الملف الشخصي بنجاح',
     'tooManyAttempts' => 'تم تجاوز الحد الأقصى للمحاولات، يرجى المحاولة لاحقًا.',
+    'notEnoughCoins' => 'ليس لديك رصيد كافي من النقاط',
+    'minimumDollar1' => 'يجب أن تسحب على الأقل $',
+    'minimumDollar2' => ' من الرصيد!',
+    'successfullyWithdraw' => 'تم إرسال طلب السحب بنجاح!'
 ];

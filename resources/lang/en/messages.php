@@ -9,5 +9,9 @@ return [
     'register_success' => 'Registration successful',
     'token-refreshed' => 'Token refreshed',
     'user-update' => 'Profile updated successfully',
-    'tooManyAttempts' => 'Maximum attempts exceeded, please try again later.'
+    'tooManyAttempts' => 'Maximum attempts exceeded, please try again later.',
+    'notEnoughCoins' => 'You don\'t have enough coins!',
+    'minimumDollar1' => 'You should withdraw at least $',
+    'minimumDollar2' => ' worth of coins!',
+    'successfullyWithdraw' => 'Your withdrawal request was successfully received!',
 ];
