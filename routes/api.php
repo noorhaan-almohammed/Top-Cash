@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WithdrawalController;
+use App\Http\Controllers\WithdrawMethodController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,3 +31,4 @@ Route::middleware('auth:api')->put('/profile', [AuthController::class, 'updatePr
 
 Route::middleware('auth:api')->post('/withdraw', [WithdrawalController::class, 'withdraw']);
 Route::middleware('auth:api')->get('/getUserCoins',[UserController::class,'showUserCoins']);
+Route::get('/getWithdrawMethods',[WithdrawMethodController::class,'index']);
