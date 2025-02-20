@@ -71,6 +71,18 @@ class Handler extends ExceptionHandler
         if ($e instanceof AuthenticationException) {
             return $this->formatErrorResponse('Unauthenticated, please login.', 401);
         }
+        
+        if ($e instanceof \Exception) {
+            return $this->formatErrorResponse($e->getMessage(), 500);
+        }
+
+        // General Unexpected Errors
+        if (config('app.debug')) {
+            return parent::render($request, $e); // Default Laravel error page for debugging
+        }
+
+        return $this->formatErrorResponse('An unexpected error occurred.', 500);
+
     }
      protected function formatErrorResponse(string $message, int $statusCode, $errors = null)
     {
