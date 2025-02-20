@@ -57,9 +57,11 @@ class WithdrawalController extends Controller
         return response()->json(['status' => 200, 'message' => __('messages.successfullyWithdraw')]);
     }
 
-    public function index(){
+    public function index(Request $request){
         $userId = Auth::id();
-        $withdraw = Withdrawal::where('user_id',$userId)->get();
+        $withdraw = Withdrawal::where('user_id', $userId)
+                                ->status($request->input('status'))
+                                ->get();
         return response()->json($withdraw);
     }
 }

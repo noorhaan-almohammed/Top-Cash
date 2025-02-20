@@ -2,10 +2,11 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FAQController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WithdrawalController;
+use App\Http\Controllers\CompletedOfferController;
 use App\Http\Controllers\WithdrawMethodController;
 
 /*
@@ -36,4 +37,4 @@ Route::middleware('auth:api')->get('/getUserCoins',[UserController::class,'showU
 Route::get('/getWithdrawMethods',[WithdrawMethodController::class,'index']);
 Route::get('/getFaqs',[FAQController::class,'index']);
 Route::middleware('auth:api')->get('/getWithdraws',[WithdrawalController::class,'index']);
-// Route::middleware('auth:api')->get('/getCompletedOffers',[WithdrawalController::class,'index']);
+Route::middleware('auth:api')->get('/getCompletedOffers',[CompletedOfferController::class,'index']);
