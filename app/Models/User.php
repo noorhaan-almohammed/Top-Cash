@@ -21,8 +21,8 @@ class User extends Authenticatable implements JWTSubject
     protected $fillable = [
         'username', 'email', 'password', 'account_balance', 'country_id',
         'gender', 'sl_earnings', 'sl_today_earnings', 'sl_total', 'sl_today',
-        'reg_time', 'last_activity', 'ref_code', 'log_ip', 'activate', 'rec_hash',
-        'disabled', 'ref_source'
+        'reg_time', 'last_activity', 'ref_code', 'log_ip','reg_ip', 'activate', 'rec_hash',
+        'disabled', 'ref_source','bounce_code_used' , 'ref'
     ];
     public $timestamps = false;
     /**

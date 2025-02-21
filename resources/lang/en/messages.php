@@ -14,4 +14,6 @@ return [
     'minimumDollar1' => 'You should withdraw at least $',
     'minimumDollar2' => ' worth of coins!',
     'successfullyWithdraw' => 'Your withdrawal request was successfully received!',
+    'bounce_code' => 'Congratulations, the bounce has been added to your balance',
+    'expaired_code' => 'Bonus code has expired, maximum required users have been reached',
 ];

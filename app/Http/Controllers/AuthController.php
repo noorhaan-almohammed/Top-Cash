@@ -2,38 +2,75 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\RateLimiter;
+use App\Models\ConfigSite;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
+
+use Illuminate\Support\Facades\Log;
+use function Laravel\Prompts\select;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
         $request->validate([
-            'username' => 'required|string|max:32|unique:users',
-            'email' => 'required|string|email|max:128|unique:users',
-            'password' => 'required|string|min:6|confirmed',
+            'username' => 'required|string|max:32',
+            'email' => 'required|string|email|max:35|unique:users',
+            'password' => 'required|string|min:6|max:20|confirmed',
+            'bounce_code' => 'nullable|string|max:35',
+            'gender' => 'nullable|integer'
         ]);
+        $referrer = User::where('ref_code', $request->bounce_code)->value('id');
 
         $encryptedPassword = $this->encryptPassword($request->password);
+        $refCode = $this->generateRefCode($request->email);
 
         $user = User::create([
             'username' => $request->username,
             'email' => $request->email,
             'password' => $encryptedPassword,
+            'gender' => $request->gender ?? 0,
+            'reg_ip' => $request->ip(),
+            'log_ip' => $request->ip(),
+            'ref_code' => $refCode,
+            'ref' => $referrer ?? 0,
             'reg_time' => time(),
             'last_activity' => time(),
         ]);
+        if ($user->ref > 0) {
+            app(ActivityController::class)->addActivity($user->ref, 4, serialize(['id' => $user->id]));
+        }
+        $bounce_user_limit = ConfigSite::where('config_name','bounce_user_limit')->value('config_value');
+        $bounce_code = ConfigSite::where('config_name','bounce_code')->value('config_value');
+        $bounce_amount = ConfigSite::where('config_name','bounce_amount')->value('config_value');
+        $usedCount = User::where('bounce_code_used',$bounce_code)->count();
 
+        $user = User::findOrFail($user->id);
+
+        $message = "";
+        if($request->has('bounce_code') && $request->bounce_code == $bounce_code && $usedCount < $bounce_user_limit){
+           $user->update(['bounce_code_used'=> $request->bounce_code]);
+           $user->increment('account_balance', $bounce_amount);
+           $message = __('messages.bounce_code');
+        }elseif($user->ref == 0){
+            $message = __('messages.expaired_code');
+        }
         $token = JWTAuth::fromUser($user);
-
         return response()->json([
             'message' => __('messages.register_success'),
+            'code_bounse_msg' => $message,
             'user' => $user,
             'token' => $token
         ], 201);
+    }
+    public function generateRefCode($email)
+    {
+        $hash = hash('sha256', $email . time());
+        return substr($hash, 0, 18);
     }
     public function login(Request $request)
     {
@@ -65,6 +102,13 @@ class AuthController extends Controller
         $user->update([
             'last_activity' => time(),
             'log_ip' => $request->ip()
+        ]);
+
+        DB::table('user_logins')->insert([
+            'uid' => $user->id,
+            'ip' => $request->ip(),
+            'info' => $request->header('User-Agent'),
+            'time' => now(),
         ]);
 
         $token = JWTAuth::fromUser($user);
