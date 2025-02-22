@@ -148,11 +148,12 @@ class AuthController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
 
         $request->validate([
-            'username' => 'sometimes|string|max:32|unique:users,username,' . $user->id,
-            'email' => 'sometimes|string|email|max:128|unique:users,email,' . $user->id,
+            'username' => 'sometimes|string|max:32',
+            'email' => 'sometimes|string|email|max:128|unique:users,email',
+            'gender' => 'nullable|integer'
         ]);
 
-        $user->update($request->only(['username', 'email']));
+        $user->update($request->only(['username', 'email', 'gender']));
 
         return response()->json(['message' => __('messages.user-update'), 'user' => $user]);
     }
