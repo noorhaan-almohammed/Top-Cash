@@ -149,11 +149,16 @@ class AuthController extends Controller
 
         $request->validate([
             'username' => 'sometimes|string|max:32',
-            'email' => 'sometimes|string|email|max:128|unique:users,email',
+            'email' => 'sometimes|string|email|max:128|unique:users,email,' . $user->id,
             'gender' => 'nullable|integer'
         ]);
 
-        $user->update($request->only(['username', 'email', 'gender']));
+        $newUser = array_filter([
+            'username' => $request->username ?? $user->username,
+            'email' => $request->email && $request->email !== $user->email ? $request->email : $user->email,
+            'gender' => $request->gender ?? $user->gender,
+        ], fn($value) => $value !== null);
+        $user->update($newUser);
 
         return response()->json(['message' => __('messages.user-update'), 'user' => $user]);
     }
