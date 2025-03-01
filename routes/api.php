@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WithdrawalController;
 use App\Http\Controllers\CompletedOfferController;
+use App\Http\Controllers\UserSupportController;
 use App\Http\Controllers\WithdrawMethodController;
 
 /*
@@ -38,3 +39,5 @@ Route::get('/getWithdrawMethods',[WithdrawMethodController::class,'index']);
 Route::get('/getFaqs',[FAQController::class,'index']);
 Route::middleware('auth:api')->get('/getWithdraws',[WithdrawalController::class,'index']);
 Route::middleware('auth:api')->get('/getCompletedOffers',[CompletedOfferController::class,'index']);
+
+Route::middleware('auth:api')->post('/sendSupportMail', [UserSupportController::class, 'createSupportMail']);
