@@ -41,3 +41,6 @@ Route::middleware('auth:api')->get('/getWithdraws',[WithdrawalController::class,
 Route::middleware('auth:api')->get('/getCompletedOffers',[CompletedOfferController::class,'index']);
 
 Route::middleware('auth:api')->post('/sendSupportMail', [UserSupportController::class, 'createSupportMail']);
+Route::post('/forget_password',[AuthController::class , 'forgetPasswword']);
+
+Route::post('/reset_password',[AuthController::class , 'resetPassword']);

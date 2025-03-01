@@ -59,10 +59,10 @@ class Handler extends ExceptionHandler
             'exception' => $e
         ]);
 
-        // Not Found Exception (Model or Route)
-        if ($e instanceof ModelNotFoundException || $e instanceof NotFoundHttpException) {
-            return $this->formatErrorResponse('The requested model was not found.', 404);
-        }
+        // // Not Found Exception (Model or Route)
+        // if ($e instanceof ModelNotFoundException || $e instanceof NotFoundHttpException) {
+        //     return $this->formatErrorResponse('The requested model was not found.', 404);
+        // }
 
         if ($e instanceof AuthorizationException) {
             return $this->formatErrorResponse('You do not have permission to access this resource.', 403);
@@ -71,7 +71,7 @@ class Handler extends ExceptionHandler
         if ($e instanceof AuthenticationException) {
             return $this->formatErrorResponse('Unauthenticated, please login.', 401);
         }
-        
+
         if ($e instanceof \Exception) {
             return $this->formatErrorResponse($e->getMessage(), 500);
         }

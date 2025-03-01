@@ -2,15 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\ConfigSite;
 use Illuminate\Http\Request;
+use App\Mail\PasswordRecoveryMail;
+
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
-
 use Illuminate\Support\Facades\Log;
 use function Laravel\Prompts\select;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\RateLimiter;
 
 class AuthController extends Controller
@@ -166,5 +171,76 @@ class AuthController extends Controller
     private function encryptPassword($password)
     {
         return md5(md5(sha1($password) . sha1(md5($password))));
+    }
+
+    public function forgetPasswword(Request $request){
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|max:128|exists:users,email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'message' => Lang::get($validator->errors()->first())
+            ]);
+        }
+
+        $email = $request->input('email');
+        $recUser = User::where('email' , $email)->first();
+        $newhash = bin2hex(random_bytes(16));
+        $recover_url = url('/api/reset_password?newhash=' . $newhash);
+
+        DB::table('users_recovery')->updateOrInsert(
+            ['user_id' => $recUser->id],
+            ['hash_key' => $newhash, 'time' => time()]
+        );
+
+        Mail::to($email)->send(new PasswordRecoveryMail($recUser, $recover_url));
+
+        return response()->json([
+            'status' => 200,
+            'msg' => __('messages.send_email_forget_passwird')
+        ]);
+    }
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'newhash'   => 'required|string|exists:users_recovery,hash_key',
+            'password'  => 'required|string|min:6|confirmed'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'message' => $validator->errors()->first()
+            ]);
+        }
+
+        $recoveryData = DB::table('users_recovery')->where('hash_key', $request->newhash)->first();
+
+        $createdAt = Carbon::createFromTimestamp((int) $recoveryData->time);
+
+        if ($createdAt->diffInMinutes(Carbon::now()) > 30) {
+            return response()->json([
+                'status' => 403,
+                'message' => __('messages.link_expired')
+            ]);
+        }
+
+        $user = User::find($recoveryData->user_id);
+        if (!$user) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'User not found!'
+            ]);
+        }
+
+        $user->password = $this->encryptPassword($request->password);
+        $user->save();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Your password has been successfully reset. You can now log in with your new password.'
+        ]);
     }
 }
