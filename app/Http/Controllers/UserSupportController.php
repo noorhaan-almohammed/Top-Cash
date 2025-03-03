@@ -1,11 +1,12 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Jobs\sendSupportMail;
 use App\Mail\SupportMail;
 use App\Models\UserSupport;
 use Illuminate\Http\Request;
+use App\Jobs\sendSupportMail;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
@@ -22,14 +23,14 @@ class UserSupportController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'phone' => 'required|string|min:10',
+            'phone' => 'required|string|min:10|max:25',
             'question' => 'required|string|min:5|max:4000',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
-                'message' => $validator->errors()->first(),
+                'message' => Lang::get($validator->errors()->first())
             ], 422);
         }
 
@@ -51,12 +52,12 @@ class UserSupportController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Your support request has been sent successfully!',
+                'message' => __('messages.send_support_email'),
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Failed to send support request. ' . $e->getMessage(),
+                'message' => __('messages.failed_send_support'),
             ], 500);
         }
     }

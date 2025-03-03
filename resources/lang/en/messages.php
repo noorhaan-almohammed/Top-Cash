@@ -18,5 +18,8 @@ return [
     'expaired_code' => 'Bonus code has expired, maximum required users have been reached',
     'send_email_forget_password' => 'We\'ve sent you an email! Check your mailbox to carry on with the process.',
     'verification_code_expired' => 'This verification code has expired. Please request a new one.',
-    'reset_password_successfully' => 'Your password has been successfully reset. You can now log in with your new password.'
+    'reset_password_successfully' => 'Your password has been successfully reset. You can now log in with your new password.',
+    'send_support_email' => 'Your support request has been sent successfully!',
+    'failed_send_support' => 'Failed to send support request. please try again later',
+    'user_not_found' => 'User not found!',
 ];

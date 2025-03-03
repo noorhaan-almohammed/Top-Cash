@@ -211,7 +211,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 500,
-                'message' => $validator->errors()->first()
+                'message' => Lang::get($validator->errors()->first())
             ]);
         }
 
@@ -230,7 +230,7 @@ class AuthController extends Controller
         if (!$user) {
             return response()->json([
                 'status' => 404,
-                'message' => 'User not found!'
+                'message' => __('messages.user_not_found')
             ]);
         }
 
