@@ -13,12 +13,12 @@ class PasswordRecoveryMail extends Mailable
     use Queueable, SerializesModels;
 
     public $user;
-    public $recover_url;
+    public $verification_code;
 
-    public function __construct(User $user, $recover_url)
+    public function __construct(User $user, $verification_code)
     {
         $this->user = $user;
-        $this->recover_url = $recover_url;
+        $this->verification_code = $verification_code;
     }
 
     public function build()
@@ -27,7 +27,7 @@ class PasswordRecoveryMail extends Mailable
                     ->view('password_recovery')
                     ->with([
                         'username' => $this->user->username,
-                        'recover_url' => $this->recover_url,
+                        'verification_code' => $this->verification_code,
                     ]);
     }
 }

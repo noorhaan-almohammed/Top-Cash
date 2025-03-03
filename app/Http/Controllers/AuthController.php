@@ -187,25 +187,24 @@ class AuthController extends Controller
 
         $email = $request->input('email');
         $recUser = User::where('email' , $email)->first();
-        $newhash = bin2hex(random_bytes(16));
-        $recover_url = url('/api/reset_password?newhash=' . $newhash);
+        $verification_code = random_int(1000,9999);
 
         DB::table('users_recovery')->updateOrInsert(
             ['user_id' => $recUser->id],
-            ['hash_key' => $newhash, 'time' => time()]
+            ['hash_key' => $verification_code, 'time' => time()]
         );
 
-        Mail::to($email)->send(new PasswordRecoveryMail($recUser, $recover_url));
+        Mail::to($email)->send(new PasswordRecoveryMail($recUser, $verification_code));
 
         return response()->json([
             'status' => 200,
-            'msg' => __('messages.send_email_forget_passwird')
+            'msg' => __('messages.send_email_forget_password'),
         ]);
     }
     public function resetPassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'newhash'   => 'required|string|exists:users_recovery,hash_key',
+            'verification_code'   => 'required|string|exists:users_recovery,hash_key',
             'password'  => 'required|string|min:6|confirmed'
         ]);
 
@@ -216,14 +215,14 @@ class AuthController extends Controller
             ]);
         }
 
-        $recoveryData = DB::table('users_recovery')->where('hash_key', $request->newhash)->first();
+        $recoveryData = DB::table('users_recovery')->where('hash_key', $request->verification_code)->first();
 
         $createdAt = Carbon::createFromTimestamp((int) $recoveryData->time);
 
         if ($createdAt->diffInMinutes(Carbon::now()) > 30) {
             return response()->json([
                 'status' => 403,
-                'message' => __('messages.link_expired')
+                'message' => __('messages.verification_code_expired')
             ]);
         }
 
@@ -240,7 +239,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => 200,
-            'message' => 'Your password has been successfully reset. You can now log in with your new password.'
+            'message' => __('messages.reset_password_successfully')
         ]);
     }
 }

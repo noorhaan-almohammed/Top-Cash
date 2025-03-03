@@ -16,7 +16,7 @@ return [
     'successfullyWithdraw' => 'Your withdrawal request was successfully received!',
     'bounce_code' => 'Congratulations, the bounce has been added to your balance',
     'expaired_code' => 'Bonus code has expired, maximum required users have been reached',
-    'send_email_forget_passwird' => 'We\'ve sent you an email! Check your mailbox to carry on with the process.',
-    'link_expired' => 'This reset link has expired. Please request a new one.',
+    'send_email_forget_password' => 'We\'ve sent you an email! Check your mailbox to carry on with the process.',
+    'verification_code_expired' => 'This verification code has expired. Please request a new one.',
     'reset_password_successfully' => 'Your password has been successfully reset. You can now log in with your new password.'
 ];

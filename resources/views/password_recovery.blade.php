@@ -15,9 +15,9 @@
                 <td style="padding-top: 15px; padding-bottom: 15px;">
                     Hi {{ $username }},
                     <br /><br />
-                    It looks like you requested a password reset. No worries, we've got you covered! Click the link below to set a new password:
+                    It looks like you requested a password reset. No worries, we've got you covered!
                     <br /><br />
-                    <a href="{{ $recover_url }}" style="color: #4CAF50;">Reset Your Password</a>
+                    <p style="color: #4CAF50;">Your verification code : {{ $verification_code }}</p>
                     <br /><br />
                     If you didn't request this, just ignore this email. Your account is still safe and secure.
                     <br /><br />
