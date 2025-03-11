@@ -44,3 +44,5 @@ Route::middleware('auth:api')->post('/sendSupportMail', [UserSupportController::
 Route::post('/forget_password',[AuthController::class , 'forgetPasswword']);
 
 Route::post('/reset_password',[AuthController::class , 'resetPassword']);
+
+Route::middleware('auth:api')->put('/change_password',[AuthController::class , 'changePassword']);

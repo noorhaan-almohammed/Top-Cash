@@ -49,19 +49,19 @@ class AuthController extends Controller
         if ($user->ref > 0) {
             app(ActivityController::class)->addActivity($user->ref, 4, serialize(['id' => $user->id]));
         }
-        $bounce_user_limit = ConfigSite::where('config_name','bounce_user_limit')->value('config_value');
-        $bounce_code = ConfigSite::where('config_name','bounce_code')->value('config_value');
-        $bounce_amount = ConfigSite::where('config_name','bounce_amount')->value('config_value');
-        $usedCount = User::where('bounce_code_used',$bounce_code)->count();
+        $bounce_user_limit = ConfigSite::where('config_name', 'bounce_user_limit')->value('config_value');
+        $bounce_code = ConfigSite::where('config_name', 'bounce_code')->value('config_value');
+        $bounce_amount = ConfigSite::where('config_name', 'bounce_amount')->value('config_value');
+        $usedCount = User::where('bounce_code_used', $bounce_code)->count();
 
         $user = User::findOrFail($user->id);
 
         $message = "";
-        if($request->has('bounce_code') && $request->bounce_code == $bounce_code && $usedCount < $bounce_user_limit){
-           $user->update(['bounce_code_used'=> $request->bounce_code]);
-           $user->increment('account_balance', $bounce_amount);
-           $message = __('messages.bounce_code');
-        }elseif($user->ref == 0){
+        if ($request->has('bounce_code') && $request->bounce_code == $bounce_code && $usedCount < $bounce_user_limit) {
+            $user->update(['bounce_code_used' => $request->bounce_code]);
+            $user->increment('account_balance', $bounce_amount);
+            $message = __('messages.bounce_code');
+        } elseif ($user->ref == 0) {
             $message = __('messages.expaired_code');
         }
         $token = JWTAuth::fromUser($user);
@@ -173,7 +173,8 @@ class AuthController extends Controller
         return md5(md5(sha1($password) . sha1(md5($password))));
     }
 
-    public function forgetPasswword(Request $request){
+    public function forgetPasswword(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|max:128|exists:users,email',
         ]);
@@ -186,8 +187,8 @@ class AuthController extends Controller
         }
 
         $email = $request->input('email');
-        $recUser = User::where('email' , $email)->first();
-        $verification_code = random_int(1000,9999);
+        $recUser = User::where('email', $email)->first();
+        $verification_code = random_int(1000, 9999);
 
         DB::table('users_recovery')->updateOrInsert(
             ['user_id' => $recUser->id],
@@ -204,8 +205,8 @@ class AuthController extends Controller
     public function resetPassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'verification_code'   => 'required|string|exists:users_recovery,hash_key',
-            'password'  => 'required|string|min:6|confirmed'
+            'verification_code' => 'required|string|exists:users_recovery,hash_key',
+            'password' => 'required|string|min:6|confirmed'
         ]);
 
         if ($validator->fails()) {
@@ -242,4 +243,41 @@ class AuthController extends Controller
             'message' => __('messages.reset_password_successfully')
         ]);
     }
+
+    public function changePassword(Request $request)
+    {
+        $userID = Auth::id();
+        $user = User::findOrFail($userID);
+
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|string|min:6|max:20|confirmed',
+            'oldPassword' => 'required|string|min:6|max:20',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 500,
+                'message' =>  Lang::get($validator->errors()->first())
+            ]);
+        }
+
+        $old_password = $this->encryptPassword($request->oldPassword);
+
+        if ($old_password !== $user->password) {
+            return response()->json([
+                'status' => 403,
+                'message' => __('messages.old_password_wrong')
+            ]);
+        }
+
+        $user->password = $this->encryptPassword($request->password);
+        $user->save();
+
+        return response()->json([
+            'status' => 200,
+            'message' => __('messages.change_password_successfully')
+        ]);
+    }
+
+
 }

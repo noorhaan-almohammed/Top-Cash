@@ -11,4 +11,10 @@ class WithdrawMethodController extends Controller
         $methods = WithdrawMethod::get();
         return response()->json($methods);
     }
+
+    // public function index(Request $request){
+    //     $method = $request->query('method');
+    //     $methods = WithdrawMethod::when($method, fn($q)=>$q->where('method',$method))->get();
+    //     return response()->json($methods);
+    // }
 }

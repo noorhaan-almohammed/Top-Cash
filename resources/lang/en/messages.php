@@ -22,4 +22,6 @@ return [
     'send_support_email' => 'Your support request has been sent successfully!',
     'failed_send_support' => 'Failed to send support request. please try again later',
     'user_not_found' => 'User not found!',
+    'old_password_wrong' => 'The old password is incorrect.',
+    'change_password_successfully' => 'Password changed successfully.',
 ];
