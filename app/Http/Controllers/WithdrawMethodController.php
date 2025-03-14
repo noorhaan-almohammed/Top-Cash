@@ -7,14 +7,19 @@ use App\Models\WithdrawMethod;
 
 class WithdrawMethodController extends Controller
 {
-    public function index(){
-        $methods = WithdrawMethod::get();
+    public function get_all_methods()
+    {
+        $methods = WithdrawMethod::select('method', 'icon_url')->distinct()->get()->makeHidden(['required_coins']);
         return response()->json($methods);
     }
+    
+    public function index(Request $request)
+    {
+        $method = $request->input('method');
+        $methods = WithdrawMethod::select(['id', 'method', 'info', 'minimum'])
+                                ->when($method, fn($q) => $q->where('method', $method))
+                                ->get();
+     return response()->json($methods);
+    }
 
-    // public function index(Request $request){
-    //     $method = $request->query('method');
-    //     $methods = WithdrawMethod::when($method, fn($q)=>$q->where('method',$method))->get();
-    //     return response()->json($methods);
-    // }
 }

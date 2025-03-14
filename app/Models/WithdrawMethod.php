@@ -15,5 +15,14 @@ class WithdrawMethod extends Model
     protected $fillable = [
         'method',
         'minimum',
+        'icon_url'
     ];
+
+    public $appends = [
+        'required_coins'
+    ];
+    public function getRequiredCoinsAttribute(){
+        $coins_rate = SiteConfig::where('config_name', 'coins_rate')->value('config_value');
+        return $this->minimum*$coins_rate;
+    }
 }

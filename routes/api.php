@@ -35,7 +35,9 @@ Route::middleware('auth:api')->put('/profile', [AuthController::class, 'updatePr
 Route::middleware('auth:api')->post('/withdraw', [WithdrawalController::class, 'withdraw']);
 Route::middleware('auth:api')->get('/getUserCoins',[UserController::class,'showUserCoins']);
 
-Route::get('/getWithdrawMethods',[WithdrawMethodController::class,'index']);
+
+Route::get('/getWithdrawMethods',[WithdrawMethodController::class,'get_all_methods']);
+Route::get('/getWithdrawMethodDetails',[WithdrawMethodController::class,'index']);
 Route::get('/getFaqs',[FAQController::class,'index']);
 Route::middleware('auth:api')->get('/getWithdraws',[WithdrawalController::class,'index']);
 Route::middleware('auth:api')->get('/getCompletedOffers',[CompletedOfferController::class,'index']);
