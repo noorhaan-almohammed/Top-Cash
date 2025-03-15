@@ -17,8 +17,7 @@ class WithdrawalController extends Controller
         $user = Auth::user();
 
         $validator = Validator::make($request->all(), [
-            'amount' => 'required|numeric|min:0',
-            'method' => 'required|exists:withdraw_methods,id',
+            'method_id' => 'required|exists:withdraw_methods,id',
             'info' => 'required|string|min:5',
         ]);
 
@@ -29,24 +28,21 @@ class WithdrawalController extends Controller
             ]);
         }
 
-        $method = WithdrawMethod::find($request->method);
+        $method = WithdrawMethod::find($request->method_id);
         $coins_rate = SiteConfig::where('config_name', 'coins_rate')->value('config_value');
-        $coinsValue = number_format($request->amount / $coins_rate, 2, '.', '');
+        $coins_required = $method->minimum * $coins_rate;
 
-        if ($user->account_balance < $request->amount) {
+        if ($user->account_balance < $coins_required) {
             return response()->json(['status' => 500, 'message' =>  __('messages.notEnoughCoins')]);
-        }
-        if ($coinsValue < $method->minimum) {
-            return response()->json(['status' => 500, 'message' => __('messages.minimumDollar1') . $method->minimum . __('messages.minimumDollar2')]);
         }
 
         $user = User::findOrFail($user->id);
-        $user->decrement('account_balance', $request->amount);
+        $user->decrement('account_balance', $coins_required);
 
         Withdrawal::create([
             'user_id' => $user->id,
-            'coins' => $request->amount,
-            'amount' => $coinsValue,
+            'coins' => $coins_required,
+            'amount' => $method->minimum,
             'method_id' => $method->id,
             'method_name' => $method->method,
             'payment_info' => $request->info,
