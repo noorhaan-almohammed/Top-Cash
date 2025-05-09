@@ -27,7 +27,8 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:35|unique:users',
             'password' => 'required|string|min:6|max:20|confirmed',
             'bounce_code' => 'nullable|string|max:35',
-            'gender' => 'nullable|integer'
+            'gender' => 'nullable|integer',
+            'fcm_token' => 'required|string|max:225'
         ]);
         $referrer = User::where('ref_code', $request->bounce_code)->value('id');
 
@@ -45,6 +46,7 @@ class AuthController extends Controller
             'ref' => $referrer ?? 0,
             'reg_time' => time(),
             'last_activity' => time(),
+            'fcm_token' => $request->fcm_token
         ]);
         if ($user->ref > 0) {
             app(ActivityController::class)->addActivity($user->ref, 4, serialize(['id' => $user->id]));
@@ -81,7 +83,8 @@ class AuthController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required'
+            'password' => 'required',
+            'fcm_token' => 'required|string|max:225'
         ]);
 
         $key = 'login_attempts_' . $request->ip();
@@ -106,7 +109,8 @@ class AuthController extends Controller
 
         $user->update([
             'last_activity' => time(),
-            'log_ip' => $request->ip()
+            'log_ip' => $request->ip(),
+            'fcm_token' => $request->fcm_token
         ]);
 
         DB::table('user_logins')->insert([

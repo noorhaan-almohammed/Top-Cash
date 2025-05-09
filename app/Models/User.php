@@ -22,7 +22,7 @@ class User extends Authenticatable implements JWTSubject
         'username', 'email', 'password', 'account_balance', 'country_id',
         'gender', 'sl_earnings', 'sl_today_earnings', 'sl_total', 'sl_today',
         'reg_time', 'last_activity', 'ref_code', 'log_ip','reg_ip', 'activate', 'rec_hash',
-        'disabled', 'ref_source','bounce_code_used' , 'ref'
+        'disabled', 'ref_source','bounce_code_used' , 'ref' , 'fcm_token'
     ];
     public $timestamps = false;
     /**
